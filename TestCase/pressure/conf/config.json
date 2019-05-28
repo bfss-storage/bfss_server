@@ -1,0 +1,6 @@
+{
+    "rpc": {
+        "server": "localhost",
+        "port": "9092"
+    }
+}

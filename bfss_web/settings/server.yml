@@ -1,0 +1,14 @@
+#服务端口号
+service_port: "9628"
+
+# 服务地址
+host: "127.0.0.1"
+
+# BFSS_API服务端口号
+bfss_api_service_port: "30000"
+
+# BFSS_API服务地址
+bfss_api_host: "10.0.1.119"
+
+
+

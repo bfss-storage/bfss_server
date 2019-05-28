@@ -1,0 +1,31 @@
+digraph framework {
+    fontname="Consolas";
+    fontsize=12;
+
+    node [shape="Mrecord", fontname="Consolas", fontsize=10];
+    edge [color="#4788C7", fontname="Consolas", fontsize=10];
+
+    # bfss_api  [label="<f0> BFSS_API-1  |<f1> BFSS_API-2  |<f2> BFSS_API ..." ];
+    # bfss_regm [label="<f0> BFSS_RegM-1 |<f1> BFSS_RegM-2 |<f2> BFSS_RegM ..."];
+    # bfss_sn   [label="<f0> BFSS_SN-1   |<f1> BFSS_SN-2   |<f2> BFSS_SN ..."];
+
+    bfss_api  [label="<f0> BFSS_API  "];
+    bfss_regm [label="<f0> BFSS_RegM "];
+    bfss_sn   [label="<f0> BFSS_SN   "];
+
+    subgraph cluster_mongo {
+        mongo_api  [label="mongo for api\n   Objects", shape="cylinder" color="#E7463D"];
+        mongo_regm [label="mongo for regm\n   Volumes", shape="cylinder" color="#E7463D"];
+        mongo_sn   [label="mongo for sn\n   Blocks", shape="cylinder" color="#E7463D"];
+         {rank="same"  mongo_api, mongo_regm, mongo_sn}
+     }
+
+
+    bfss_api:f0 -> bfss_regm:f0;
+    bfss_api:f0 -> bfss_sn:f0;
+    bfss_sn:f0  -> bfss_regm:f0;
+
+    bfss_api:f0  -> mongo_api;
+    bfss_regm:f0 -> mongo_regm;
+    bfss_sn:f0   -> mongo_sn;
+}

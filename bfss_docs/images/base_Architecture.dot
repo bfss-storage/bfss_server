@@ -1,0 +1,40 @@
+digraph framework {
+    fontname="Consolas";
+    fontsize=12;
+
+    node [shape="Mrecord", fontname="Consolas", fontsize=10];
+    edge [color="#4788C7", fontname="Consolas", fontsize=10];
+
+    gateway [label="im/Gateway Services", width=4];
+
+    subgraph cluster_media {
+        label="im/Media Services";
+        node [width=1.6];
+        rankdir="LR"
+
+        media [label="{Upload |Download }"];
+        transfer [label="Transfer"];
+        {rank = same; media transfer}
+    }
+
+    redis  [label="Redis \nCache", shape="cylinder" color="#E7463D"];
+    mongo  [label="mongo \nPersistence", shape="cylinder" color="#E7463D"];
+    {rank = same; mongo redis}
+
+    media  -> redis;
+    media  -> mongo;
+
+    node [width=1.6];
+    DFS [label="FastDFS"];
+    transfer -> DFS;
+
+    Client1 [label="Client 1"];
+    ClientN [label="... Client N"];
+
+    Client1 -> gateway;
+    ClientN -> gateway [label="MTP Request"];
+    gateway -> media  [label="RPC Request"];
+
+    S3  [label="Amazon S3"];
+    transfer -> S3;
+}

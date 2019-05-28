@@ -1,0 +1,66 @@
+digraph framework {
+    fontname="Consolas";
+    fontsize=12;
+
+    node [shape="Mrecord", fontname="Consolas", fontsize=10];
+    edge [color="#4788C7", fontname="Consolas", fontsize=10];
+
+    gateway [label="im/Gateway Services", width=7];
+
+    subgraph cluster_media {
+        label="im/Media Services"
+        node [width=1.6];
+        rankdir="LR"
+
+        media [label="{Upload |Download }"];
+        transfer [label="Transfer"];
+        {rank = same; media transfer}
+    }
+
+    redis  [label="Redis \nCache", shape="cylinder" color="#E7463D"];
+    mongo  [label="mongo \nPersistence", shape="cylinder" color="#E7463D"];
+    {rank = same; mongo redis}
+
+    media  -> redis;
+    media  -> mongo;
+
+    #node [width=1.6];
+    DFS [label="FastDFS"];
+    transfer -> DFS;
+
+    Client1 [label="Client 1"];
+    Clientx [label="Client..."];
+    ClientN [label="Client N"];
+
+    Client1 -> gateway;
+    Clientx -> gateway;
+    ClientN -> gateway [label="MTP Request"];
+    gateway -> media  [label="RPC Request"];
+
+    S3  [label="Amazon S3"];
+    transfer -> S3;
+
+    subgraph cluster_new {
+        label="im/New Media Services"
+        style="filled";
+        color="orange";
+        node [width=1.6];
+
+        media_new [label="{Upload |Download }"];
+    }
+    gateway -> media_new;
+
+    subgraph cluster_bfss {
+        node [style="filled", color="orange"];
+        ranksep=0.25;
+
+        bfss_api  [label="BFSS Service API"];
+        bfss_regm [label="BFSS Register Management"];
+        bfss_sn   [label="BFSS Storage Node"];
+
+        bfss_api -> bfss_regm;
+        bfss_api -> bfss_sn;
+        bfss_sn  -> bfss_regm;
+    }
+    media_new -> bfss_api
+}

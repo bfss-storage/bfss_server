@@ -1,0 +1,21 @@
+digraph framework {
+    fontname="Consolas";
+    fontsize=12;
+
+    node [shape="Mrecord", fontname="Consolas", fontsize=10];
+    edge [color="#4788C7", fontname="Consolas", fontsize=10];
+
+    bfss_api  [label="<f0> BFSS_API-1  |<f1> BFSS_API-2 | <f2> memcached " ];
+    bfss_regm [label="<f0> BFSS_RegM-1 | <f1>  mongo "];
+    bfss_sn   [label="<f0> BFSS_SN-1   |<f1> BFSS_SN-2   |<f2> BFSS_SN-3"];
+
+    press_test_client -> bfss_api:f0;
+
+    bfss_api:f0 -> bfss_regm:f0;
+    bfss_api:f0 -> bfss_sn:f0;
+    bfss_sn:f0  -> bfss_regm:f0;
+
+    bfss_api:f0  -> bfss_regm:f1;
+    bfss_sn:f0   -> bfss_regm:f1;
+
+}

@@ -1,0 +1,101 @@
+
+// BFSS  Block File Storage System 块文件存储系统
+// 微服务API 调用接口 （CDN 交互）
+
+// 错误代码
+enum BFSS_RESULT {
+	//-1 --- -49 BFSS 内部错误使用
+	//-50 --- -100 外部接口使用
+	//-100 --- -254 预留可选  
+	BFSS_SUCCESS = 0        		// 调用成功
+	BFSS_UNK_ERROR = -255,   		// 未知错误  
+	BFSS_NOTFOUND = -50,     		// 文件没有找到
+	BFSS_DUP_ID = -51,       		// 文件FID已存在
+	BFSS_PARAM_ERROR = -52,  		// 参数错误
+	BFSS_NOT_ENOUGH_SPACE = -53, 	// 存储空间不足	
+}
+
+// 文件信息
+struct FILE_INFO{
+    1:required i32 FileSize     // 文件大小（最大4G）
+    2:required i64 CreateTime   // 文件创建时间
+    3:required i32 FileFlag     // 文件旗帜
+    4:optional string FileTag   // 文件标签
+    5:optional string Hash      // 文件Hash，去重
+}
+//返回 文件信息
+struct FILE_INFO_RESULT{
+	1:required BFSS_RESULT Result // 错误代码
+	2:optional FILE_INFO FileInfo // 文件信0息
+}
+
+//返回 读文件结果
+struct READ_RESULT{
+    1:required BFSS_RESULT Result // 错误代码
+    2:optional binary Data        // 读取的数据， 真实数据，包含数据真实大小
+}
+
+// 返回  获取的块密钥结果
+struct BLK_KEY_RESULT{
+    1:required BFSS_RESULT Result // 错误代码
+    2:optional binary BlkKey      // 块密钥
+}
+
+// 块信息
+struct BLK_INFO{
+    1:required i32 BlkSize     // 当前文件在这个块中所占的数据大小（由于块是加密的，所以这里的大小是按16字节块对齐的）
+    2:required i32 DataOff     // 当前文件在这个块中的数据偏移（由于块是加密的，所以这里的偏移是按16字节块对齐的）
+    3:required i32 VolumeId    // 卷ID
+    4:required i32 BlkIndex    // 卷中的索引值
+    5:optional binary BlkKey   // 块对应的密钥
+}
+
+//文件块信息
+struct FILE_BLKS_INFO{
+    1:required i32 FileSize         // 文件大小
+    2:required i32 CreateFlag       // 文件旗帜
+    3:required i64 CreateTime       // 文件创建时间    
+    4:required list<BLK_INFO> Blks  // 块信息，一个文件需要很多块存储，跨块
+	5:optional string CreateTag     // 文件标签
+}
+
+//返回 文件块信息
+struct FILE_BLKS_RESULT{
+    1:required BFSS_RESULT Result   		// 返回结果，参考结构体
+	2:optional FILE_BLKS_INFO FileBlksInfo 	// 文件块的详细信息
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+	// 函数名： GetFileInfo 获取文件信息
+	// 参数：
+	// fid 文件id，同上
+	// 返回值：
+	//			参考FILE_INFO结构体说明
+    FILE_INFO_RESULT GetFileInfo(1:string fid),
+
+    // 函数名： ReadBlk 读取加密文件
+	// 参数：
+	// fid 文件id，同上
+	// size 预读数据大小，-1全部
+	// offset 文件的数据偏移（16对齐）
+	// 返回值：
+	//			参考READ_RESULT结构体说明
+    READ_RESULT ReadBlk(1:string fid, 2:i32 size, 3:i32 offset),
+
+	// 函数名： GetObjectBlks 获取文件块信息
+	// 参数：
+	// fid 文件id，同上
+	// 返回值：
+	//			返回FILE_BLKS_RESULT结构体
+    FILE_BLKS_RESULT GetObjectBlks(1:string fid),	
+
+    // 函数名： GetObjectBlkKey 获取块密钥结果（可选）
+	// 参数:
+	// fid 文件id，同上
+	// offset 文件偏移
+	// 返回值：
+	//			参考BLK_KEY_RESULT结构体定义
+    BLK_KEY_RESULT GetObjectBlkKey(1:string fid, 2:i32 offset),
+	
+	

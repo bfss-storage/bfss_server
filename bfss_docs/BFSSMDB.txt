@@ -1,0 +1,65 @@
+﻿
+// BFSS  Block File Storage System 块文件存储系统
+// BFSS Mongo DB
+	
+{
+	//文件对象信息
+	"ObjectDb" : {
+		"ObjectCol":{
+			"OId":"string(128) Key", 	//Key  对象ID
+			"VolumeId":"int32",		 	//卷ID
+			"BeginIndex":"int32",	 	//起始块ID
+			"Offset":"int32",		 	//块起始偏移
+			"Size":"int32",			 	//对象大小
+			"CreateTime":"int64",	 	//写入时间
+			"Flag":"int32",			 	//旗帜
+			"Tag":"string(128 utf-8)" 	//对象描述
+			“Hash”:"string (64) Key"    //Key 去重快速定位
+			“Head”:"Byte 16"            //文件头
+  			"Complete":"Bool"           //文件结束标志
+		},
+		"ObjectHashCol":{
+			“Hash”:"string (64) Key"    //Key 去重快速定位
+			“Head”:"Byte 16"            //文件头
+			"Size":"int32",			 	//对象大小
+			"VolumeId":"int32",		 	//卷ID
+			"BeginIndex":"int32",	 	//起始块ID
+			"Offset":"int32",		 	//块起始偏移
+            "OIdArray" : array,         //对象OId集合
+            "RefCount" : "int32",		//引用计数
+            "_RefCount" : "int32",		//对象累计计数（只增不减）
+		}
+	},
+	
+	//卷对象信息
+	"VolumeDb":{
+		"VolumeCol":{
+			"VolumeId":"int32 Key",			//卷ID
+			"BServerAddr":"string(48)",		//微服务IP：port
+			"BlkCount":"int32",				//块的数量
+			"CurPosition":"int64",			//当前写位置（块中偏移）
+			"Desc":"string(256 utf-8)"		//描述
+		}
+	},
+	
+	//块加密
+	"BKeyDb":{
+		"BKeyCol":{						//联合查询
+			"VolumeId" :"int32 key",    // Key 卷ID
+			"BlkIndex" :"int32",		//块的索引(Index)
+			"Flag":"int32",			 	//旗帜 第一位如果被置位 表示这块是加密块
+			“BKey”： "byte(32)”			//Key -> 16B对齐
+		}
+	},
+	
+	//碎片整理
+	"VolumeDb": {
+		"VolumeChipCol":{				//后续合并，定期碎片整理
+			"Size":"int32 Key"			//Key 碎片内存首先查找
+			"Offset":"int32"			//碎片在块中的偏移
+			"BlkIndex":"int32"		    //块的索引(Index)
+			"VolumeId":"int32"			//卷的ID
+		}
+	}
+
+}

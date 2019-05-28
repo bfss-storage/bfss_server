@@ -1,0 +1,64 @@
+# IDEA
+.idea
+
+# GIT
+.git
+
+#out
+out
+*.img
+!out/bin/*.cfg
+!out/bin/*.properties
+gmon.out
+
+
+# CMake generated Files
+CMakeFiles
+cmake-build-debug
+cmake-build-release
+CMakeCache.txt
+*.cbp
+Makefile
+!TestCase/pressure/Makefile
+cmake_install.cmake
+
+# google test files
+TestCase/client/googletest-build/
+TestCase/client/googletest-download/
+TestCase/client/googletest-src/
+
+# TestCase outputs
+bin/
+lib/
+
+
+# go get-files
+TestCase/client/go/bin/
+TestCase/client/go/pkg/
+TestCase/client/go/src/BFSS_API/
+TestCase/client/go/src/BFSS_REGMD/
+TestCase/client/go/src/BFSS_SN/
+TestCase/client/go/src/github.com/
+bfss_go
+
+TestCase/pressure/thrift
+TestCase/pressure/bin
+TestCase/pressure/*.xlsx
+TestCase/pressure/.vscode
+TestCase/pressure/.log
+
+
+.DS_Store
+TestCase/pressure/web/ui/node_modules
+TestCase/pressure/web/ui/dist
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+

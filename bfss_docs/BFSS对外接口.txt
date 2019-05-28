@@ -1,0 +1,102 @@
+
+// BFSS  Block File Storage System 块文件存储系统
+// 微服务api调用接口
+
+// 错误代码
+enum BFSS_RESULT {
+	//-1 --- -49  内部错误使用
+	//-50 --- -100 外部接口使用
+	//-100 --- -254 预留可选  
+	BFSS_SUCCESS = 0        		// 调用成功
+	BFSS_UNK_ERROR = -255,   		// 未知错误  
+	BFSS_NOTFOUND = -50,     		// 文件没有找到
+	BFSS_DUP_ID = -51,       		// 文件FID已存在
+	BFSS_PARAM_ERROR = -52,  		// 参数错误
+	BFSS_NOT_ENOUGH_SPACE = -53, 	// 存储空间不足	
+}
+
+// 文件信息
+struct FILE_INFO{
+    1:required i32 FileSize     // 文件大小（最大4G）
+    2:required i64 CreateTime   // 文件创建时间
+    3:required i32 FileFlag     // 文件旗帜
+    4:optional string FileTag   // 文件标签
+    5:optional string Hash      // 文件Hash，去重
+}
+//返回 文件信息
+struct FILE_INFO_RESULT{
+	1:required BFSS_RESULT Result // 错误代码
+	2:optional FILE_INFO FileInfo // 文件信息
+}
+
+//去重对象信息
+struct OBJECT_HASHASH_INFO{
+    1:required string ObjectId    // 对象OID
+    2:required i32 ObjectSize     // 对象大小（最大4G）
+    3:required i64 CreateTime     // 对象创建时间
+    4:required i32 ObjectFlag     // 对象旗帜
+    5:optional string ObjectTag   // 对象标签
+    6:optional string Hash        // 对象Hash，去重
+}
+//返回 去重文件信息
+struct OBJECT_HASHASH_INFO_RESULT{
+    1:required BFSS_RESULT Result                   // 错误代码
+    2:optional OBJECT_HASHASH_INFO ObjHasHashInfo   // 去重文件信息
+}
+
+//返回 读文件结果
+struct READ_RESULT{
+    1:required BFSS_RESULT Result // 错误代码
+    2:optional binary Data        // 读取的数据， 真实数据，包含数据真实大小
+}
+
+//-------------------------------------------------------------------------------------------------------
+	
+    // 函数名： CreateObject 创建一个存储对象
+	// 参数:
+    // fid  文件id，最多128个英文字符（只允许'-','_','.',字母和数字），如果id已被使用这里会返回 BFSS_DUP_ID 
+    // size 文件大小，这个值范围，必须在1-4G（byte）之间。
+    // flag 文件旗帜，高16位保留（必须置0），低16位调用者可自定义使用。
+    // tag  文件标签。调用者可以给文件打上标签（字符串必须是utf-8,最多128字节）。
+    // 返回值：
+    //      参考 BFSS_RESULT 结构体定义
+    BFSS_RESULT CreateObject(1:string fid, 2:i32 size, 3:i32 flag = 0, 4:string tag=""),
+
+	// 函数名: Write 写文件
+	// 参数：
+	// fid 文件id，同上
+	// offset 文件偏移
+	// data 数据内容
+	// 返回值：
+	//			参考 BFSS_RESULT 结构体定义
+    BFSS_RESULT Write(1:string fid, 2:i32 offset, 3:binary data),
+
+//-------------------------------------------------------------------------------------------------------
+	
+	// 函数名： GetFileInfo 获取文件信息
+	// 参数：
+	// fid 文件id，同上
+	// 返回值：
+	//			参考FILE_INFO结构体说明
+    FILE_INFO_RESULT GetFileInfo(1:string fid),
+
+	// 函数名： ObjectLockHasHash 通过hash值 文件大小 文件头 找文件，去重文件
+	// 参数：
+	// hash  文件hash值
+	// size  文件大小
+	// head  文件头16字节
+	//返回值
+	//      参考 OBJECT_HASHASH_INFO_RESULT 结构体定义
+	OBJECT_HASHASH_INFO_RESULT ObjectLockHasHash(1:string hash, 2:i32 size, 3.binary head),
+
+    // 函数名： Read 读取文件
+	// 参数: 
+	// fid 文件id，同上
+	// size 预读数据大小
+	// offset 文件的数据偏移
+	// 返回值：
+	//			参考READ_RESULT结构体说明
+    READ_RESULT Read(1:string fid, 2:i32 size, 3:i32 offset),
+	
+	
+	
